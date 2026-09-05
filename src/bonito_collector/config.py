@@ -7,7 +7,6 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 
-
 # Scrape intervals in seconds, per collector type (BON-001 deliverable 8)
 DEFAULT_INTERVALS: dict[str, int] = {
     "metrics": 15,   # lightweight numeric metrics
@@ -37,7 +36,7 @@ class CollectorConfig:
     intervals: dict[str, int] = field(default_factory=lambda: dict(DEFAULT_INTERVALS))
 
     @classmethod
-    def from_env(cls) -> "CollectorConfig":
+    def from_env(cls) -> CollectorConfig:
         dsn = os.environ.get("BONITO_DSN")
         if not dsn:
             raise ValueError(

@@ -9,7 +9,6 @@ from typing import Any
 
 from .db import ReadOnlyPG
 
-
 # ── Deliverable 2: top queries (pg_stat_statements) ──────────────────
 SQL_TOP_QUERIES = """
 SELECT
@@ -116,7 +115,7 @@ def collect_plan(pg: ReadOnlyPG, query: str) -> dict[str, Any] | None:
     if not q.lower().startswith(("select", "with")):
         return None  # only plan read queries
     try:
-        rows = pg.query(f"EXPLAIN (FORMAT JSON) {q}")  # noqa: S608 - internal fixed prefix
+        rows = pg.query(f"EXPLAIN (FORMAT JSON) {q}")
         return {"query": query[:300], "plan": rows[0] if rows else None}
     except Exception as e:  # broad: any planning error is non-fatal
         return {"query": query[:300], "error": str(e)}

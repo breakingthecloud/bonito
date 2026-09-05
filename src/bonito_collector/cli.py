@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import argparse
 import time
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from prometheus_client import start_http_server
 
@@ -20,7 +20,7 @@ from .emit import export_prometheus, push_events
 
 
 def _now() -> str:
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def run_once(cfg: CollectorConfig, pg: ReadOnlyPG) -> dict:
