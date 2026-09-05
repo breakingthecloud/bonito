@@ -42,6 +42,10 @@ bonito_table_bloat_pct{table="public.orders"} 4.2
 
 See `examples/events.sample.json` for a fully-populated example.
 
+When `BONITO_STORE_URL` is set, this exact payload is POSTed to
+`<url>/events` and persisted by `bonito-store` (dedupe by fingerprint,
+7-day baselines, retention). See [`docs/store.md`](store.md).
+
 ### Top queries (`pg_stat_statements`)
 
 ```json
