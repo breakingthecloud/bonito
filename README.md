@@ -25,8 +25,8 @@ Bonito connects **read-only** to your database, reads the system views the engin
 |-----------|------|:------:|
 | bonito-collector | Read-only PostgreSQL collector | ✅ Done (BON-001) |
 | bonito-store | SQLite event store + `POST /events` | ✅ Done (BON-002) |
-| bonito-api | FastAPI query layer (private deploy, public contract) | 🟡 Done, pending merge (BON-003) |
-| bonito-mcp | MCP server for AI agents | 🔴 BON-004 |
+| bonito-api | FastAPI query layer (private deploy, public contract) | ✅ Done (BON-003) |
+| bonito-mcp | MCP server — 8 tools for AI agents | 🟡 Done, pending merge (BON-004) |
 
 ## Setup
 
@@ -38,8 +38,8 @@ uv pip install -e ".[dev]"
 
 ## Docs & Examples (v0.1.0)
 
-- **Docs:** [`docs/quickstart.md`](docs/quickstart.md) (full pipeline) · [`docs/configuration.md`](docs/configuration.md) · [`docs/metrics-and-events.md`](docs/metrics-and-events.md) · [`docs/store.md`](docs/store.md) · [`docs/api.md`](docs/api.md)
-- **Examples:** [`examples/docker-compose.yml`](examples/docker-compose.yml) (PG + store + api + collector stack) · [`examples/readonly-role.sql`](examples/readonly-role.sql) (read-only role) · [`examples/bonito.env.example`](examples/bonito.env.example) (collector env) · [`examples/store.env.example`](examples/store.env.example) (store env) · [`examples/api.env.example`](examples/api.env.example) (api env) · [`examples/events.sample.json`](examples/events.sample.json) (JSON event payload) · [`examples/store-push.sh`](examples/store-push.sh) (push sample → baselines)
+- **Docs:** [`docs/quickstart.md`](docs/quickstart.md) (full pipeline) · [`docs/configuration.md`](docs/configuration.md) · [`docs/metrics-and-events.md`](docs/metrics-and-events.md) · [`docs/store.md`](docs/store.md) · [`docs/api.md`](docs/api.md) · [`docs/mcp.md`](docs/mcp.md)
+- **Examples:** [`examples/docker-compose.yml`](examples/docker-compose.yml) (PG + store + api + mcp + collector stack) · [`examples/readonly-role.sql`](examples/readonly-role.sql) (read-only role) · [`examples/bonito.env.example`](examples/bonito.env.example) (collector env) · [`examples/store.env.example`](examples/store.env.example) (store env) · [`examples/api.env.example`](examples/api.env.example) (api env) · [`examples/mcp.env.example`](examples/mcp.env.example) (mcp env) · [`examples/events.sample.json`](examples/events.sample.json) (JSON event payload) · [`examples/store-push.sh`](examples/store-push.sh) (push sample → baselines)
 
 Fastest path — full pipeline in one command:
 

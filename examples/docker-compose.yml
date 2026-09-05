@@ -75,5 +75,19 @@ services:
       - store
     restart: unless-stopped
 
+  mcp:
+    build:
+      context: ..
+      dockerfile: examples/Dockerfile.mcp
+    container_name: bonito-mcp
+    environment:
+      BONITO_API_URL: http://api:8100
+      BONITO_API_KEY: change-me
+    ports:
+      - "8840:8840"
+    depends_on:
+      - api
+    restart: unless-stopped
+
 volumes:
   store-data:
