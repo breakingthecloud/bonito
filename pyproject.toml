@@ -1,0 +1,26 @@
+[project]
+name = "bonito-collector"
+version = "0.1.0"
+description = "Deep database observability collector — a free DBmarlin. Captures slow queries, locks, wait events and table stats."
+authors = [{ name = "Carlos Cortez" }]
+license = { text = "Apache-2.0" }
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "psycopg[binary]>=3.2",
+    "prometheus-client>=0.20",
+    "httpx>=0.27",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+bonito-collector = "bonito_collector.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
