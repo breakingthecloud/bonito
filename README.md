@@ -23,8 +23,8 @@ Bonito connects **read-only** to your database, reads the system views the engin
 
 | Component | What | Status |
 |-----------|------|:------:|
-| bonito-collector | Read-only PostgreSQL collector | 🟡 In progress (BON-001) |
-| bonito-store | Time-series storage | 🔴 BON-002 |
+| bonito-collector | Read-only PostgreSQL collector | ✅ Done (BON-001) |
+| bonito-store | SQLite event store + `POST /events` | 🟡 Done, pending merge (BON-002) |
 | bonito-api | FastAPI query layer | 🔴 BON-003 |
 | bonito-mcp | MCP server for AI agents | 🔴 BON-004 |
 
