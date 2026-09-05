@@ -160,7 +160,7 @@ def build_mcp(client: BonitoClient) -> MCPServer:
             "trees, wait analysis, execution plans, baselines and remediation "
             "advice. Use these tools to diagnose PostgreSQL performance problems."
         ),
-        version="0.1.0",
+        version="0.1.2",
     )
     for name, fn in make_tools(client).items():
         server.tool(name=name)(fn)

@@ -1,6 +1,6 @@
 [project]
-name = "bonito-mcp"
-version = "0.1.0"
+name = "bonito-mcp-server"
+version = "0.1.2"
 description = "Bonito MCP server — deep DB observability tools for AI agents (BON-004)."
 authors = [{ name = "Carlos Cortez" }]
 license = { text = "Apache-2.0" }

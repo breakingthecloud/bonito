@@ -11,11 +11,17 @@ store/API, not duplicated here).
 ## Run
 
 ```bash
-uv pip install -e bonito-mcp
+uv pip install -e bonito-mcp          # local (repo checkout)
+pip install bonito-mcp-server         # from PyPI
 export BONITO_API_URL=http://localhost:8100
 export BONITO_API_KEY=change-me
 bonito-mcp                      # stdio transport
 ```
+
+> **PyPI name note:** the distribution is `bonito-mcp-server` — the bare name
+> `bonito-mcp` is already taken on PyPI by an unrelated project. The console
+> command is still `bonito-mcp`. With `uvx`, use
+> `uvx --from bonito-mcp-server bonito-mcp`.
 
 ## Connect to an agent
 
