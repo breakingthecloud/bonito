@@ -105,10 +105,10 @@ def make_tools(client: BonitoClient) -> dict[str, Callable[..., Any]]:
         return build_blocking_tree(data.get("locks", []))
 
     async def explain_query(
-        db_instance: str = "default", fingerprint: str = ""
+        fingerprint: str, db_instance: str = "default"
     ) -> dict[str, Any]:
         """Execution plan (EXPLAIN JSON) for a query fingerprint: node types, seq scans, index usage, cost.
-        Example: 'what is the plan for fingerprint -6842865755026457642?'"""
+        Example: 'what is the plan for fingerprint -6842865755026457642?' -> explain_query(fingerprint='-6842865755026457642')."""
         return await client.plan(fingerprint, db_instance)
 
     async def get_wait_analysis(
@@ -119,7 +119,7 @@ def make_tools(client: BonitoClient) -> dict[str, Callable[..., Any]]:
         return await client.waits(db_instance, minutes)
 
     async def compare_to_baseline(
-        db_instance: str = "default", fingerprint: str = "", days: int = 7
+        fingerprint: str, db_instance: str = "default", days: int = 7
     ) -> dict[str, Any]:
         """Compare a query's current avg_ms against its 7-day baseline. regression_pct > 0 means slower.
         Example: 'is the checkout query slower than usual?' -> compare_to_baseline(fingerprint='...')."""

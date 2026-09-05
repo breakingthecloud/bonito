@@ -1,0 +1,27 @@
+site_name: Bonito OSS
+site_description: Deep database observability — a free DBmarlin
+site_url: https://github.com/breakingthecloud/bonito
+repo_url: https://github.com/breakingthecloud/bonito
+
+nav:
+  - Home: index.md
+  - Quickstart: quickstart.md
+  - Collector & events: metrics-and-events.md
+  - Store: store.md
+  - API: api.md
+  - MCP server: mcp.md
+  - Configuration: configuration.md
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: teal
+    accent: cyan
+  icon:
+    repo: fontawesome/brands/github
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - tables
