@@ -1,8 +1,8 @@
 """Tests for bonito-collector — no live DB needed (unit + safety checks)."""
 import pytest
 
-from bonito_collector.config import CollectorConfig, DEFAULT_INTERVALS
 from bonito_collector import collectors
+from bonito_collector.config import DEFAULT_INTERVALS, CollectorConfig
 
 
 def test_config_from_env_requires_dsn(monkeypatch):

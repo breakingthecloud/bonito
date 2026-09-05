@@ -36,6 +36,20 @@ source .venv/bin/activate
 uv pip install -e ".[dev]"
 ```
 
+## Docs & Examples (v0.1.0)
+
+- **Docs:** [`docs/quickstart.md`](docs/quickstart.md) · [`docs/configuration.md`](docs/configuration.md) · [`docs/metrics-and-events.md`](docs/metrics-and-events.md)
+- **Examples:** [`examples/docker-compose.yml`](examples/docker-compose.yml) (PG + collector stack) · [`examples/readonly-role.sql`](examples/readonly-role.sql) (read-only role) · [`examples/bonito.env.example`](examples/bonito.env.example) (env template) · [`examples/events.sample.json`](examples/events.sample.json) (JSON event payload)
+
+Fastest path — local PostgreSQL + one-shot snapshot:
+
+```bash
+docker compose -f examples/docker-compose.yml up -d db
+docker exec -i bonito-db psql -U postgres -d app < examples/readonly-role.sql
+set -a; source examples/bonito.env.example; set +a
+bonito-collector --once
+```
+
 ## Security (golden rule)
 
 - Connection is **READ-ONLY** (a DB user with only `SELECT` on stat views)

@@ -1,0 +1,51 @@
+{
+  "collected_at": "2026-09-04T02:10:00+00:00",
+  "top_queries": [
+    {
+      "fingerprint": "-6842865755026457642",
+      "calls": 1284,
+      "total_ms": 15932.11,
+      "mean_ms": 12.43,
+      "max_ms": 841.02,
+      "rows": 245680,
+      "buffer_hit_ratio": 99.2,
+      "query": "SELECT * FROM orders WHERE customer_id = $1"
+    }
+  ],
+  "locks": [
+    {
+      "blocked_pid": 1412,
+      "blocked_user": "app",
+      "blocked_query": "UPDATE orders SET status='paid' WHERE id=$1",
+      "blocking_pid": 1408,
+      "blocking_user": "app",
+      "blocking_query": "SELECT ... FROM orders WHERE ... FOR UPDATE",
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid"
+    }
+  ],
+  "sessions": [
+    {
+      "pid": 1412,
+      "user": "app",
+      "database": "app",
+      "state": "active",
+      "wait_event_type": "Lock",
+      "wait_event": "transactionid",
+      "query_age_s": 42,
+      "query": "UPDATE orders SET status='paid' WHERE id=$1"
+    }
+  ],
+  "tables": [
+    {
+      "schema": "public",
+      "table": "orders",
+      "seq_scan": 1200,
+      "idx_scan": 45800,
+      "live_rows": 245680,
+      "dead_rows": 10241,
+      "bloat_pct": 4.2,
+      "last_autovacuum": "2026-09-04T00:00:00+00:00"
+    }
+  ]
+}
