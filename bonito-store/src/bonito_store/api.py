@@ -27,7 +27,7 @@ class PlansIn(BaseModel):
 def create_app(db_path: str, retention_days: int = 7) -> FastAPI:
     store = BonitoStore(db_path, retention_days)
 
-    app = FastAPI(title="bonito-store", version="0.1.0")
+    app = FastAPI(title="bonito-store", version="0.1.1")
 
     @app.get("/health")
     def health() -> dict[str, str]:

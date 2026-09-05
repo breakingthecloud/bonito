@@ -1,6 +1,6 @@
 [project]
 name = "bonito-store"
-version = "0.1.0"
+version = "0.1.1"
 description = "Bonito deep DB observability store — SQLite persistence for query/plan/lock/session events (BON-002)."
 authors = [{ name = "Carlos Cortez" }]
 license = { text = "Apache-2.0" }

@@ -1,6 +1,6 @@
 [project]
 name = "bonito-collector"
-version = "0.1.0"
+version = "0.1.1"
 description = "Deep database observability collector — a free DBmarlin. Captures slow queries, locks, wait events and table stats."
 authors = [{ name = "Carlos Cortez" }]
 license = { text = "Apache-2.0" }
