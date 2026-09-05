@@ -1,6 +1,7 @@
-# Bonito v0.1.0 — local dev stack: PostgreSQL (with pg_stat_statements) + collector.
+# Bonito v0.1.0 — local dev stack: PostgreSQL (with pg_stat_statements) + store + collector.
 #
-#   docker compose -f examples/docker-compose.yml up -d
+#   docker compose -f examples/docker-compose.yml up -d          # all three
+#   docker compose -f examples/docker-compose.yml up -d db store # without collector
 #
 # Then create the read-only role:
 #   docker exec -i bonito-db psql -U postgres -d app < examples/readonly-role.sql
@@ -26,6 +27,21 @@ services:
     volumes:
       - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh:ro
 
+  store:
+    build:
+      context: ..
+      dockerfile: examples/Dockerfile.store
+    container_name: bonito-store
+    environment:
+      BONITO_DB: /data/bonito.db
+      BONITO_STORE_PORT: "8000"
+      BONITO_RETENTION_DAYS: "7"
+    ports:
+      - "8000:8000"
+    volumes:
+      - store-data:/data
+    restart: unless-stopped
+
   collector:
     build:
       context: ..
@@ -33,9 +49,14 @@ services:
     container_name: bonito-collector
     environment:
       BONITO_DSN: postgresql://bonito_ro:change-me@db:5432/app
+      BONITO_STORE_URL: http://store:8000
       BONITO_PROM_PORT: "9187"
     ports:
       - "9187:9187"
     depends_on:
       - db
+      - store
     restart: unless-stopped
+
+volumes:
+  store-data:

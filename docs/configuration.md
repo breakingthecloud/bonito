@@ -31,6 +31,18 @@ in `src/bonito_collector/config.py`.
 The loop runs at the fastest cadence (15s) and each collector collects on its
 own schedule.
 
+## Store configuration
+
+The store (`bonito-store`) has its own variables (see `docs/store.md`):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BONITO_DB` | `bonito.db` | SQLite file path |
+| `BONITO_STORE_PORT` | `8000` | HTTP port |
+| `BONITO_RETENTION_DAYS` | `7` | Retention window |
+
+Example: `examples/store.env.example`.
+
 ## Security (golden rule)
 
 - The connection is **READ-ONLY**: every session runs
