@@ -87,6 +87,24 @@ curl -H "X-API-Key: $BONITO_API_KEY" localhost:8100/queries/top?limit=5
 curl -H "X-API-Key: $BONITO_API_KEY" localhost:8100/baseline/-6842865755026457642
 ```
 
+## 6. Give an AI agent the tools (MCP)
+
+```bash
+uv pip install -e bonito-mcp
+export BONITO_API_URL=http://localhost:8100
+bonito-mcp                     # stdio — then add to Claude/Bedrock/Strands
+```
+
+Claude CLI:
+
+```bash
+claude mcp add bonito -- bonito-mcp
+```
+
+Now the agent can answer "which queries are slow?", "who is blocking whom?",
+"is this query slower than its baseline?", and "what should I do?" — see
+`docs/mcp.md` for the full tool list and the deadlock demo flow.
+
 Or push the bundled sample snapshot into the store and read it:
 
 ```bash
@@ -109,8 +127,10 @@ Or push the bundled sample snapshot into the store and read it:
 | `bonito-collector` | Top queries, locks/blocking tree, sessions/waits, table bloat, `EXPLAIN` plans |
 | `bonito-store` | Persists those events + 7-day baselines per fingerprint |
 | `bonito-api` | Query layer for AI agents / MCP / Remo (contract public, deployment private) |
+| `bonito-mcp` | 8 tools any AI agent consumes natively (Claude/Bedrock/Strands) |
 | Prometheus | Numeric gauges on `:9187/metrics` |
 
 Docs: [`docs/configuration.md`](configuration.md) ·
 [`docs/metrics-and-events.md`](metrics-and-events.md) ·
-[`docs/store.md`](store.md) · [`docs/api.md`](api.md)
+[`docs/store.md`](store.md) · [`docs/api.md`](api.md) ·
+[`docs/mcp.md`](mcp.md)
