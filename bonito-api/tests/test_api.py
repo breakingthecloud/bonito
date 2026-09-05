@@ -5,6 +5,7 @@ import pytest
 from bonito_store.store import BonitoStore
 from fastapi.testclient import TestClient
 
+from bonito_api import __version__
 from bonito_api.app import create_app
 
 API_KEY = "test-key"
@@ -164,4 +165,4 @@ def test_openapi_contract_is_public_and_versioned(client):
     paths = r.json()["paths"]
     for p in ("/queries/top", "/locks/active", "/waits", "/health/{db_instance}", "/baseline/{fingerprint}", "/ingest"):
         assert p in paths
-    assert r.json()["info"]["version"] == "0.1.0"
+    assert r.json()["info"]["version"] == __version__

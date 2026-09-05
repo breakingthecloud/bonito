@@ -3,7 +3,7 @@ info:
   title: bonito-api
   description: Bonito query layer. The OpenAPI contract is public; every data endpoint
     requires X-API-Key (BONITO_API_KEY). See bonito-api/openapi.yaml.
-  version: 0.1.0
+  version: 0.1.2
 paths:
   /queries/top:
     get:

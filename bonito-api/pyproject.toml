@@ -1,6 +1,6 @@
 [project]
 name = "bonito-api"
-version = "0.1.0"
+version = "0.1.2"
 description = "Bonito API — FastAPI query layer over bonito-store (BON-003). Private deployment, public OpenAPI contract."
 authors = [{ name = "Carlos Cortez" }]
 license = { text = "Apache-2.0" }
