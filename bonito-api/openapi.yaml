@@ -1,0 +1,437 @@
+openapi: 3.1.0
+info:
+  title: bonito-api
+  description: Bonito query layer. The OpenAPI contract is public; every data endpoint
+    requires X-API-Key (BONITO_API_KEY). See bonito-api/openapi.yaml.
+  version: 0.1.0
+paths:
+  /queries/top:
+    get:
+      summary: Top queries by mean execution time
+      operationId: queries_top_queries_top_get
+      parameters:
+      - name: db_instance
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Db Instance
+      - name: period
+        in: query
+        required: false
+        schema:
+          type: string
+          default: 24h
+          title: Period
+      - name: limit
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 20
+          title: Limit
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Queries Top Queries Top Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /locks/active:
+    get:
+      summary: Recent lock events / blocking pairs
+      operationId: locks_active_locks_active_get
+      parameters:
+      - name: db_instance
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Db Instance
+      - name: minutes
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          title: Minutes
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Locks Active Locks Active Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /waits:
+    get:
+      summary: Wait breakdown by wait_event_type
+      operationId: waits_waits_get
+      parameters:
+      - name: db_instance
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Db Instance
+      - name: minutes
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          title: Minutes
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Waits Waits Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /plans/{fingerprint}:
+    get:
+      summary: Latest execution plan for a query
+      operationId: plans_plans__fingerprint__get
+      parameters:
+      - name: fingerprint
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Fingerprint
+      - name: db_instance
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Db Instance
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Plans Plans  Fingerprint  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health/{db_instance}:
+    get:
+      summary: Session + bloat summary for a database instance
+      operationId: health_health__db_instance__get
+      parameters:
+      - name: db_instance
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Db Instance
+      - name: minutes
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 10
+          title: Minutes
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Health Health  Db Instance  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /baseline/{fingerprint}:
+    get:
+      summary: Query vs its 7-day baseline (mean/p95 + regression)
+      operationId: baseline_baseline__fingerprint__get
+      parameters:
+      - name: fingerprint
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Fingerprint
+      - name: db_instance
+        in: query
+        required: false
+        schema:
+          type: string
+          default: default
+          title: Db Instance
+      - name: days
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 7
+          title: Days
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Baseline Baseline  Fingerprint  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /ingest:
+    post:
+      summary: "Compat webhook \u2014 same payload as store POST /events"
+      operationId: ingest_ingest_post
+      parameters:
+      - name: x-api-key
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: X-Api-Key
+      - name: authorization
+        in: header
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Authorization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventsIn'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+                title: Response Ingest Ingest Post
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    EventsIn:
+      properties:
+        collected_at:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Collected At
+        top_queries:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Top Queries
+        locks:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Locks
+        sessions:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Sessions
+        tables:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Tables
+        plans:
+          items:
+            additionalProperties: true
+            type: object
+          type: array
+          title: Plans
+      type: object
+      title: EventsIn
+      description: One collector snapshot. Optional fields match the collector payload.
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+        input:
+          title: Input
+        ctx:
+          type: object
+          title: Context
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError

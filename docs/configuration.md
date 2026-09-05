@@ -43,6 +43,18 @@ The store (`bonito-store`) has its own variables (see `docs/store.md`):
 
 Example: `examples/store.env.example`.
 
+## API configuration
+
+The API (`bonito-api`) reads the same SQLite file (see `docs/api.md`):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BONITO_API_KEY` | *(required)* | API key for all data endpoints (`X-API-Key` / `Bearer`) |
+| `BONITO_DB` | `bonito.db` | SQLite file path (shared with the store) |
+| `BONITO_API_PORT` | `8100` | HTTP port |
+
+Example: `examples/api.env.example`.
+
 ## Security (golden rule)
 
 - The connection is **READ-ONLY**: every session runs
