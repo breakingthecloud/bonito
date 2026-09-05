@@ -58,5 +58,22 @@ services:
       - store
     restart: unless-stopped
 
+  api:
+    build:
+      context: ..
+      dockerfile: examples/Dockerfile.api
+    container_name: bonito-api
+    environment:
+      BONITO_API_KEY: change-me
+      BONITO_DB: /data/bonito.db
+      BONITO_API_PORT: "8100"
+    ports:
+      - "8100:8100"
+    volumes:
+      - store-data:/data
+    depends_on:
+      - store
+    restart: unless-stopped
+
 volumes:
   store-data:

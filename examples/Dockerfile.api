@@ -1,0 +1,15 @@
+# bonito-api v0.1.0 — image used by examples/docker-compose.yml.
+FROM python:3.12-slim
+
+WORKDIR /app
+
+COPY bonito-store/ bonito-store/
+RUN pip install --no-cache-dir ./bonito-store
+
+COPY bonito-api/ bonito-api/
+RUN pip install --no-cache-dir ./bonito-api
+
+ENV BONITO_API_PORT=8100
+EXPOSE 8100
+
+CMD ["bonito-api", "serve"]
