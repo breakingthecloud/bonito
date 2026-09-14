@@ -20,7 +20,7 @@ uv pip install -e ".[dev]" -e bonito-store -e bonito-api
 Verify:
 
 ```bash
-bonito-collector --version   # bonito-collector 0.1.1
+bonito-collector --version   # bonito-collector 0.1.2
 bonito-store --help          # serve | prune
 bonito-api --help            # serve | spec
 ```

@@ -27,7 +27,7 @@ docker compose --env-file ~/stack/.env -p dbs -f ~/stack/dbs/docker-compose.yml 
 
 # 3. bonito images (from the repo)
 cd ~/stack/bonito-repo
-docker build -t bonito/collector:0.1.1 .
+docker build -t bonito/collector:0.1.2 .
 docker build -t bonito/store:0.1.1 bonito-store/
 docker build -t bonito/api:0.1.2 bonito-api/
 docker build -t bonito/mcp:0.1.2 bonito-mcp/
