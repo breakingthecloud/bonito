@@ -1,0 +1,25 @@
+# Cloudflare Tunnel — exposes grafana/api/mlflow under *.sofe.dev
+#
+# Token-based (dashboard-managed): create the tunnel in Cloudflare Zero Trust →
+# Networks → Tunnels, set the public hostnames in the dashboard, then:
+#   export TUNNEL_TOKEN=<token>   (or set in ~/stack/.env)
+#   docker compose --env-file ../.env -p tunnel -f docker-compose.yml up -d
+#
+# Suggested public hostnames (set in the CF dashboard ingress):
+#   grafana.demo.sofe.dev → http://obs-grafana:3000
+#   api.bonito.sofe.dev   → http://bonito-api:8100
+#   mlflow.demo.sofe.dev  → http://mlflow:5002
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN}
+    networks: [bonito-net]
+
+networks:
+  bonito-net:
+    external: true
