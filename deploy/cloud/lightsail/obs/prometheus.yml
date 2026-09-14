@@ -14,9 +14,3 @@ scrape_configs:
       - targets: ['obs-node-exporter:9100']
         labels:
           instance: bonito-demo-vm
-
-  - job_name: mlflow
-    static_configs:
-      - targets: ['mlflow:5002']
-        labels:
-          instance: bonito-demo
