@@ -7,10 +7,28 @@ from __future__ import annotations
 
 from collections.abc import Iterator
 from contextlib import contextmanager
+from datetime import date, datetime
+from decimal import Decimal
 from typing import Any
 
 import psycopg
 from psycopg.rows import dict_row
+
+
+def _jsonable(value: Any) -> Any:
+    """Coerce DB types into JSON/sqlite-friendly primitives.
+
+    psycopg returns ``Decimal`` for numeric and ``datetime`` for timestamps;
+    without coercion the dual-emit (Prometheus + JSON events) breaks on
+    ``json.dumps`` / sqlite binding.
+    """
+    if isinstance(value, Decimal):
+        return float(value)
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    if isinstance(value, (bytes, bytearray)):
+        return value.decode(errors="replace")
+    return value
 
 
 class ReadOnlyPG:
@@ -35,7 +53,10 @@ class ReadOnlyPG:
         never interpolated with client data. Values go through `params`."""
         with self.connect() as conn:
             cur = conn.execute(sql, params)
-            return cur.fetchall()
+            return [
+                {k: _jsonable(v) for k, v in dict(row).items()}
+                for row in cur.fetchall()
+            ]
 
     def has_extension(self, name: str) -> bool:
         rows = self.query(

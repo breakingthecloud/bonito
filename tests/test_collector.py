@@ -1,8 +1,13 @@
 """Tests for bonito-collector — no live DB needed (unit + safety checks)."""
+import json
+from datetime import UTC, datetime
+from decimal import Decimal
+
 import pytest
 
 from bonito_collector import collectors
 from bonito_collector.config import DEFAULT_INTERVALS, CollectorConfig
+from bonito_collector.db import _jsonable
 
 
 def test_config_from_env_requires_dsn(monkeypatch):
@@ -50,3 +55,22 @@ def test_collect_plan_accepts_select():
     res = collectors.collect_plan(pg, "SELECT 1")
     assert res is not None
     assert "plan" in res
+
+
+def test_jsonable_coerces_db_types():
+    # psycopg returns Decimal/datetime — must be JSON-serializable for push_events
+    assert _jsonable(Decimal("12.43")) == 12.43
+    assert _jsonable(datetime(2026, 1, 1, 12, 0, tzinfo=UTC)) == "2026-01-01T12:00:00+00:00"
+    assert _jsonable("plain") == "plain"
+
+
+def test_top_queries_payload_is_json_serializable():
+    row = {
+        "fingerprint": "-6842865755026457642",
+        "calls": 1284,
+        "mean_ms": Decimal("12.43"),
+        "max_ms": Decimal("841.02"),
+        "rows": 245680,
+    }
+    payload = {k: _jsonable(v) for k, v in row.items()}
+    json.dumps(payload)  # must not raise (fix for Decimal/JSON push failure)

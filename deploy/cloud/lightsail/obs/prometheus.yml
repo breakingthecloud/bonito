@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: bonito-collector
+    static_configs:
+      - targets: ['bonito-collector:9187']
+        labels:
+          instance: bonito-demo
+
+  - job_name: node
+    static_configs:
+      - targets: ['obs-node-exporter:9100']
+        labels:
+          instance: bonito-demo-vm
+
+  - job_name: mlflow
+    static_configs:
+      - targets: ['mlflow:5002']
+        labels:
+          instance: bonito-demo

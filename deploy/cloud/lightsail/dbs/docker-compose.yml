@@ -1,0 +1,82 @@
+# Databases project — the DBs Bonito will observe (each with persistent volume)
+#
+#   docker compose --env-file ../.env -p dbs -f docker-compose.yml up -d
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: dbs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: app
+    command:
+      - postgres
+      - -c
+      - shared_preload_libraries=pg_stat_statements
+      - -c
+      - pg_stat_statements.max=10000
+      - -c
+      - pg_stat_statements.track=all
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d:ro
+    networks: [bonito-net]
+
+  mongo:
+    image: mongo:7
+    container_name: dbs-mongo
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    networks: [bonito-net]
+
+  mysql:
+    image: mysql:8
+    container_name: dbs-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_MYSQL_PASSWORD:-root}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks: [bonito-net]
+
+  mariadb:
+    image: mariadb:11
+    container_name: dbs-mariadb
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_MARIADB_PASSWORD:-root}
+    volumes:
+      - maria-data:/var/lib/mysql
+    networks: [bonito-net]
+
+  redis:
+    image: redis:7-alpine
+    container_name: dbs-redis
+    restart: unless-stopped
+    command: [redis-server, --save, "60", "1"]
+    volumes:
+      - redis-data:/data
+    networks: [bonito-net]
+
+  valkey:
+    image: valkey/valkey:8-alpine
+    container_name: dbs-valkey
+    restart: unless-stopped
+    volumes:
+      - valkey-data:/data
+    networks: [bonito-net]
+
+networks:
+  bonito-net:
+    external: true
+
+volumes:
+  pg-data:
+  mongo-data:
+  mysql-data:
+  maria-data:
+  redis-data:
+  valkey-data:

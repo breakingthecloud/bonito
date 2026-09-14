@@ -1,4 +1,6 @@
 """Tests for bonito-store — dedupe, baselines, pruning, batch + API."""
+from datetime import UTC, datetime, timedelta
+
 from fastapi.testclient import TestClient
 
 from bonito_store.api import create_app
@@ -8,7 +10,7 @@ from bonito_store.store import BonitoStore
 
 def sample_events() -> dict:
     return {
-        "collected_at": "2026-09-04T02:10:00+00:00",
+        "collected_at": datetime.now(UTC).isoformat(),
         "top_queries": [
             {
                 "fingerprint": "-6842865755026457642",
@@ -101,7 +103,7 @@ def test_baseline_mean_and_p95(tmp_path):
     store = BonitoStore(tmp_path / "t.db")
     for i in range(10):
         events = sample_events()
-        events["collected_at"] = f"2026-09-04T02:{i:02d}:00+00:00"
+        events["collected_at"] = (datetime.now(UTC) - timedelta(minutes=i)).isoformat()
         store.ingest(events)
     bl = store.baselines()
     assert len(bl) == 1
