@@ -1,9 +1,9 @@
 # Bonito project — collector + store + api + mcp
 # Images are built on the host from the bonito repo Dockerfiles:
 #   docker build -t bonito/collector:0.1.2 .            (repo root)
-#   docker build -t bonito/store:0.1.1 bonito-store/
-#   docker build -t bonito/api:0.1.2 bonito-api/
-#   docker build -t bonito/mcp:0.1.2 bonito-mcp/
+#   docker build -t bonito/store:0.2.0 bonito-store/
+#   docker build -t bonito/api:0.2.0 bonito-api/
+#   docker build -t bonito/mcp:0.2.0 bonito-mcp/
 #
 #   docker compose --env-file ../.env -p bonito -f docker-compose.yml up -d
 
@@ -13,7 +13,7 @@ services:
     container_name: bonito-collector
     restart: unless-stopped
     environment:
-      BONITO_DSN: postgresql://bonito_ro:bonito@dbs-postgres:5432/app
+      BONITO_INSTANCES: '[{"name":"app","engine":"postgresql","dsn":"postgresql://bonito_ro:bonito@dbs-postgres:5432/app"},{"name":"app2","engine":"postgresql","dsn":"postgresql://bonito_ro:bonito@dbs-postgres:5432/app2"}]'
       BONITO_STORE_URL: http://bonito-store:8000
       BONITO_TOP_N: ${BONITO_TOP_N:-10}
       BONITO_PROM_PORT: "9187"
@@ -22,7 +22,7 @@ services:
     networks: [bonito-net]
 
   store:
-    image: bonito/store:0.1.1
+    image: bonito/store:0.2.0
     container_name: bonito-store
     restart: unless-stopped
     environment:
@@ -34,7 +34,7 @@ services:
     networks: [bonito-net]
 
   api:
-    image: bonito/api:0.1.2
+    image: bonito/api:0.2.0
     container_name: bonito-api
     restart: unless-stopped
     environment:
@@ -48,7 +48,7 @@ services:
     networks: [bonito-net]
 
   mcp:
-    image: bonito/mcp:0.1.2
+    image: bonito/mcp:0.2.0
     container_name: bonito-mcp
     restart: unless-stopped
     environment:
