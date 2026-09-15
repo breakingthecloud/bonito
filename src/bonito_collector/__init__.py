@@ -1,3 +1,3 @@
 """Bonito Collector — deep PostgreSQL observability (read-only)."""
 
-__version__ = "0.1.2"
+__version__ = "0.1.3"

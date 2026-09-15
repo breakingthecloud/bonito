@@ -16,7 +16,12 @@ from .collectors import (
 )
 from .config import CollectorConfig
 from .db import ReadOnlyPG
-from .emit import export_prometheus, push_events
+from .emit import (
+    export_prometheus,
+    push_events,
+    record_collector_error,
+    record_scrape_duration,
+)
 
 
 def _now() -> str:
@@ -66,10 +71,13 @@ def main() -> int:
     print(f"bonito-collector {__version__} — Prometheus on :{cfg.prometheus_port}/metrics")
     interval = min(cfg.intervals.values())  # loop at the fastest cadence
     while True:
+        started = time.monotonic()
         try:
             run_once(cfg, pg)
         except Exception as e:  # never crash the loop
+            record_collector_error()
             print(f"[{_now()}] collect error: {e}")
+        record_scrape_duration(time.monotonic() - started)
         time.sleep(interval)
 
 

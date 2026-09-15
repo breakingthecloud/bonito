@@ -1,27 +1,62 @@
 """Dual emission: Prometheus metrics (scrape) + JSON events (HTTP push).
 
-BON-001 deliverable 7.
+BON-001 deliverable 7 · BON-006 metrics enrichment.
 """
 from __future__ import annotations
 
+from collections import Counter
 from typing import Any
 
 import httpx
+from prometheus_client import Counter as PromCounter
 from prometheus_client import Gauge
 
-# Prometheus gauges (labels kept low-cardinality)
+# ── Prometheus metrics (labels kept low-cardinality) ──────────────────
+# per top query (fingerprint)
 QUERY_MEAN_MS = Gauge(
     "bonito_query_mean_ms", "Mean execution time per top query (ms)", ["fingerprint"]
 )
-BLOCKING_COUNT = Gauge(
-    "bonito_blocking_sessions", "Number of blocking session pairs"
+QUERY_CALLS = Gauge(
+    "bonito_query_calls", "Total calls per top query", ["fingerprint"]
 )
-ACTIVE_SESSIONS = Gauge(
-    "bonito_active_sessions", "Active (non-idle) sessions"
+QUERY_MAX_MS = Gauge(
+    "bonito_query_max_ms", "Max execution time per top query (ms)", ["fingerprint"]
 )
+QUERY_ROWS = Gauge(
+    "bonito_query_rows", "Total rows returned per top query", ["fingerprint"]
+)
+QUERY_BUFFER_HIT_RATIO = Gauge(
+    "bonito_query_buffer_hit_ratio", "Buffer hit ratio (0-100) per top query", ["fingerprint"]
+)
+
+# locks / sessions
+BLOCKING_COUNT = Gauge("bonito_blocking_sessions", "Number of blocking session pairs")
+ACTIVE_SESSIONS = Gauge("bonito_active_sessions", "Active (non-idle) sessions")
+SESSIONS_BY_STATE = Gauge("bonito_sessions_by_state", "Sessions by state", ["state"])
+WAIT_EVENTS_TOTAL = Gauge("bonito_wait_events_total", "Sessions waiting by event type", ["type"])
+IDLE_IN_TRANSACTION = Gauge("bonito_idle_in_transaction", "Idle-in-transaction sessions")
+
+# per table (schema.table)
 TABLE_BLOAT_PCT = Gauge(
     "bonito_table_bloat_pct", "Dead-tuple bloat percentage per table", ["table"]
 )
+TABLE_LIVE_ROWS = Gauge("bonito_table_live_rows", "Live rows per table", ["table"])
+TABLE_DEAD_ROWS = Gauge("bonito_table_dead_rows", "Dead rows per table", ["table"])
+TABLE_SEQ_SCAN = Gauge("bonito_table_seq_scan", "Sequential scans per table", ["table"])
+TABLE_IDX_SCAN = Gauge("bonito_table_idx_scan", "Index scans per table", ["table"])
+
+# collector health
+COLLECTOR_DURATION = Gauge(
+    "bonito_collector_scrape_duration_seconds", "Seconds per collector run"
+)
+COLLECTOR_ERRORS = PromCounter(
+    "bonito_collector_errors_total", "Collector loop errors (counter)"
+)
+
+
+def _set(gauge: Gauge, value: Any) -> None:
+    if value is not None:
+        gauge.set(float(value))
 
 
 def export_prometheus(
@@ -32,12 +67,43 @@ def export_prometheus(
 ) -> None:
     """Update Prometheus gauges from collected data."""
     for q in top_queries[:20]:
-        if q.get("mean_ms") is not None:
-            QUERY_MEAN_MS.labels(fingerprint=str(q["fingerprint"])).set(float(q["mean_ms"]))
+        fp = str(q.get("fingerprint"))
+        _set(QUERY_MEAN_MS.labels(fingerprint=fp), q.get("mean_ms"))
+        _set(QUERY_CALLS.labels(fingerprint=fp), q.get("calls"))
+        _set(QUERY_MAX_MS.labels(fingerprint=fp), q.get("max_ms"))
+        _set(QUERY_ROWS.labels(fingerprint=fp), q.get("rows"))
+        _set(QUERY_BUFFER_HIT_RATIO.labels(fingerprint=fp), q.get("buffer_hit_ratio"))
+
     BLOCKING_COUNT.set(len(locks))
     ACTIVE_SESSIONS.set(len(sessions))
+
+    states = Counter(s.get("state") for s in sessions if s.get("state"))
+    for state, count in states.items():
+        SESSIONS_BY_STATE.labels(state=state).set(count)
+    idle = sum(1 for s in sessions if s.get("state") == "idle in transaction")
+    IDLE_IN_TRANSACTION.set(idle)
+
+    waits = Counter(
+        s.get("wait_event_type") for s in sessions if s.get("wait_event_type")
+    )
+    for wtype, count in waits.items():
+        WAIT_EVENTS_TOTAL.labels(type=wtype).set(count)
+
     for t in tables[:20]:
-        TABLE_BLOAT_PCT.labels(table=f"{t['schema']}.{t['table']}").set(float(t["bloat_pct"]))
+        table = f"{t.get('schema')}.{t.get('table')}"
+        _set(TABLE_BLOAT_PCT.labels(table=table), t.get("bloat_pct"))
+        _set(TABLE_LIVE_ROWS.labels(table=table), t.get("live_rows"))
+        _set(TABLE_DEAD_ROWS.labels(table=table), t.get("dead_rows"))
+        _set(TABLE_SEQ_SCAN.labels(table=table), t.get("seq_scan"))
+        _set(TABLE_IDX_SCAN.labels(table=table), t.get("idx_scan"))
+
+
+def record_scrape_duration(seconds: float) -> None:
+    COLLECTOR_DURATION.set(seconds)
+
+
+def record_collector_error() -> None:
+    COLLECTOR_ERRORS.inc()
 
 
 def push_events(store_url: str, events: dict[str, Any], timeout: float = 5.0) -> bool:

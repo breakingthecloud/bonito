@@ -74,3 +74,66 @@ def test_top_queries_payload_is_json_serializable():
     }
     payload = {k: _jsonable(v) for k, v in row.items()}
     json.dumps(payload)  # must not raise (fix for Decimal/JSON push failure)
+
+
+def test_export_prometheus_enriched_gauges():
+    from prometheus_client import REGISTRY
+
+    from bonito_collector import emit
+
+    queries = [
+        {
+            "fingerprint": "fp1",
+            "mean_ms": 12.43,
+            "calls": 1284,
+            "max_ms": 841.02,
+            "rows": 245680,
+            "buffer_hit_ratio": 99.2,
+        }
+    ]
+    locks = [{"blocking_pid": 1, "blocked_pids": "[2]"}]
+    sessions = [
+        {"state": "active", "wait_event_type": "Lock"},
+        {"state": "idle in transaction", "wait_event_type": None},
+    ]
+    tables = [
+        {
+            "schema": "public",
+            "table": "orders",
+            "live_rows": 100,
+            "dead_rows": 10,
+            "bloat_pct": 5.0,
+            "seq_scan": 12,
+            "idx_scan": 34,
+        }
+    ]
+    emit.export_prometheus(queries, locks, sessions, tables)
+
+    # per-query
+    assert REGISTRY.get_sample_value("bonito_query_calls", {"fingerprint": "fp1"}) == 1284
+    assert REGISTRY.get_sample_value("bonito_query_max_ms", {"fingerprint": "fp1"}) == 841.02
+    assert REGISTRY.get_sample_value("bonito_query_rows", {"fingerprint": "fp1"}) == 245680
+    assert REGISTRY.get_sample_value(
+        "bonito_query_buffer_hit_ratio", {"fingerprint": "fp1"}
+    ) == 99.2
+    # sessions / waits
+    assert REGISTRY.get_sample_value("bonito_idle_in_transaction") == 1
+    assert REGISTRY.get_sample_value(
+        "bonito_sessions_by_state", {"state": "active"}
+    ) == 1
+    assert REGISTRY.get_sample_value("bonito_wait_events_total", {"type": "Lock"}) == 1
+    # per-table
+    assert REGISTRY.get_sample_value(
+        "bonito_table_live_rows", {"table": "public.orders"}
+    ) == 100
+    assert REGISTRY.get_sample_value(
+        "bonito_table_seq_scan", {"table": "public.orders"}
+    ) == 12
+    assert REGISTRY.get_sample_value(
+        "bonito_table_idx_scan", {"table": "public.orders"}
+    ) == 34
+
+    emit.record_scrape_duration(0.5)
+    emit.record_collector_error()
+    assert REGISTRY.get_sample_value("bonito_collector_scrape_duration_seconds") == 0.5
+    assert REGISTRY.get_sample_value("bonito_collector_errors_total") == 1
