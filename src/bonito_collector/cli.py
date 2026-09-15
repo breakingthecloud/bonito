@@ -22,6 +22,7 @@ from .emit import (
     record_collector_error,
     record_scrape_duration,
 )
+from .traces import emit_lock_span, emit_query_span, init_otlp
 
 
 def _now() -> str:
@@ -36,6 +37,24 @@ def run_once(cfg: CollectorConfig, pg: ReadOnlyPG) -> dict:
     tables = collect_table_stats(pg, cfg.top_n)
 
     export_prometheus(top, locks, sessions, tables)
+
+    for q in top[:10]:
+        emit_query_span(
+            fingerprint=q.get("fingerprint", ""),
+            query_text=q.get("query", ""),
+            mean_ms=q.get("mean_ms"),
+            max_ms=q.get("max_ms"),
+            calls=q.get("calls"),
+            rows=q.get("rows"),
+            buffer_hit_ratio=q.get("buffer_hit_ratio"),
+        )
+    for lock in locks:
+        emit_lock_span(
+            blocked_pid=lock.get("blocked_pid"),
+            blocking_pid=lock.get("blocking_pid"),
+            wait_event_type=lock.get("wait_event_type"),
+            wait_event=lock.get("wait_event"),
+        )
 
     events = {
         "collected_at": _now(),
@@ -57,6 +76,7 @@ def main() -> int:
 
     cfg = CollectorConfig.from_env()
     pg = ReadOnlyPG(cfg.dsn)
+    init_otlp(cfg.otlp_endpoint)
 
     if args.once:
         events = run_once(cfg, pg)

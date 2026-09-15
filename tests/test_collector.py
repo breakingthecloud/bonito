@@ -137,3 +137,19 @@ def test_export_prometheus_enriched_gauges():
     emit.record_collector_error()
     assert REGISTRY.get_sample_value("bonito_collector_scrape_duration_seconds") == 0.5
     assert REGISTRY.get_sample_value("bonito_collector_errors_total") == 1
+
+
+def test_otlp_disabled_by_default():
+    from bonito_collector import traces
+
+    assert traces.init_otlp(None) is False
+    # no-op when not configured — must never raise
+    traces.emit_query_span("fp", "SELECT 1", 1.0, 2.0, 3, 4, 99.0)
+    traces.emit_lock_span(2, 1, "Lock", "tuple")
+
+
+def test_config_reads_otlp_endpoint(monkeypatch):
+    monkeypatch.setenv("BONITO_DSN", "postgresql://ro@localhost/db")
+    monkeypatch.setenv("BONITO_OTLP_ENDPOINT", "http://tempo:4317")
+    cfg = CollectorConfig.from_env()
+    assert cfg.otlp_endpoint == "http://tempo:4317"

@@ -40,6 +40,16 @@ services:
       - /:/host:ro,rslave
     networks: [bonito-net]
 
+  tempo:
+    image: grafana/tempo:2.7
+    container_name: obs-tempo
+    restart: unless-stopped
+    command: [ -config.file=/etc/tempo.yaml ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    networks: [bonito-net]
+
 networks:
   bonito-net:
     external: true
@@ -47,3 +57,4 @@ networks:
 volumes:
   prom-data:
   grafana-data:
+  tempo-data:

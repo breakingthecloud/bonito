@@ -1,6 +1,6 @@
 [project]
 name = "bonito-collector"
-version = "0.1.3"
+version = "0.1.4"
 description = "Deep database observability collector — a free DBmarlin. Captures slow queries, locks, wait events and table stats."
 authors = [{ name = "Carlos Cortez" }]
 license = { text = "Apache-2.0" }
@@ -10,6 +10,8 @@ dependencies = [
     "psycopg[binary]>=3.2",
     "prometheus-client>=0.20",
     "httpx>=0.27",
+    "opentelemetry-sdk>=1.27",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.27",
 ]
 
 [project.optional-dependencies]

@@ -33,6 +33,7 @@ class CollectorConfig:
     top_n: int = 20
     store_url: str | None = None
     prometheus_port: int = 9187
+    otlp_endpoint: str | None = None
     intervals: dict[str, int] = field(default_factory=lambda: dict(DEFAULT_INTERVALS))
 
     @classmethod
@@ -47,4 +48,5 @@ class CollectorConfig:
             top_n=int(os.environ.get("BONITO_TOP_N", "20")),
             store_url=os.environ.get("BONITO_STORE_URL") or None,
             prometheus_port=int(os.environ.get("BONITO_PROM_PORT", "9187")),
+            otlp_endpoint=os.environ.get("BONITO_OTLP_ENDPOINT") or None,
         )
