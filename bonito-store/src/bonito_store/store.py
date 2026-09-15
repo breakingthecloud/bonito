@@ -211,6 +211,54 @@ class BonitoStore:
             )
         return out
 
+    # ── baseline / anomaly engine (BON-014) ────────────────────────────
+    @staticmethod
+    def _anomaly(current_ms: float, mean_ms: float, p95_ms: float,
+                  z_threshold: float = 2.0, pct_threshold: float = 20.0) -> dict[str, Any]:
+        """z-score of the current mean vs the 7-day baseline + regression %."""
+        spread = (p95_ms - mean_ms) or 1.0
+        zscore = (current_ms - mean_ms) / spread
+        regression_pct = 100.0 * (current_ms - mean_ms) / mean_ms if mean_ms else 0.0
+        status = (
+            "regression"
+            if regression_pct > pct_threshold or zscore > z_threshold
+            else "normal"
+        )
+        return {
+            "current_ms": round(current_ms, 2),
+            "mean_ms": round(mean_ms, 2),
+            "p95_ms": round(p95_ms, 2),
+            "zscore": round(zscore, 2),
+            "regression_pct": round(regression_pct, 1),
+            "status": status,
+        }
+
+    def anomaly(self, fingerprint: str, days: int | None = None) -> dict[str, Any] | None:
+        """Anomaly verdict for one fingerprint (current avg vs baseline)."""
+        baseline = self.baselines(fingerprint, days)
+        if not baseline:
+            return None
+        with self._conn() as conn:
+            row = conn.execute(
+                "SELECT avg_ms FROM query_texts WHERE fingerprint = ?", (fingerprint,)
+            ).fetchone()
+        if row is None or row["avg_ms"] is None:
+            return None
+        b = baseline[0]
+        return self._anomaly(float(row["avg_ms"]), b["mean_ms"], b["p95_ms"])
+
+    def anomalies(self, days: int | None = None) -> list[dict[str, Any]]:
+        """All fingerprints with their anomaly verdict, sorted by regression %."""
+        days = days or self.retention_days
+        results: list[dict[str, Any]] = []
+        for b in self.baselines(None, days):
+            verdict = self.anomaly(b["fingerprint"], days)
+            if verdict:
+                verdict["fingerprint"] = b["fingerprint"]
+                results.append(verdict)
+        results.sort(key=lambda r: r["regression_pct"], reverse=True)
+        return results
+
     # ── retention pruning (deliverable 4) ──────────────────────────────
     def prune(self, days: int | None = None) -> dict[str, int]:
         days = days or self.retention_days

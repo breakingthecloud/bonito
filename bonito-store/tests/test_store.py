@@ -170,3 +170,43 @@ def test_api_plans_endpoint(tmp_path):
         ).fetchone()
         assert row["cost"] == 42.0
         assert "Seq Scan" in row["plan_json"]
+
+
+def test_anomaly_detects_regression(tmp_path):
+    store = BonitoStore(tmp_path / "t.db")
+    # build a baseline with a stable query (mean 10ms)
+    for i in range(5):
+        ev = sample_events()
+        ev["collected_at"] = (datetime.now(UTC) - timedelta(days=1, minutes=i)).isoformat()
+        store.ingest(ev)  # mean_ms = 12.43
+    # simulate a regression: bump current avg_ms in query_texts
+    with store._conn() as conn:
+        conn.execute(
+            "UPDATE query_texts SET avg_ms = 60.0 WHERE fingerprint = '-6842865755026457642'"
+        )
+    verdict = store.anomaly("-6842865755026457642")
+    assert verdict is not None
+    assert verdict["status"] == "regression"
+    assert verdict["regression_pct"] > 100
+    assert verdict["zscore"] > 2
+
+    anomalies = store.anomalies()
+    assert anomalies[0]["fingerprint"] == "-6842865755026457642"
+    assert anomalies[0]["status"] == "regression"
+
+
+def test_api_anomalies_and_metrics(tmp_path):
+    app = create_app(str(tmp_path / "anom.db"))
+    client = TestClient(app)
+    client.post("/events", json=sample_events())
+    with app.state.store._conn() as conn:
+        conn.execute(
+            "UPDATE query_texts SET avg_ms = 60.0 WHERE fingerprint = '-6842865755026457642'"
+        )
+    r = client.get("/anomalies")
+    assert r.json()["anomalies"][0]["status"] == "regression"
+    r2 = client.get("/baseline/-6842865755026457642")
+    assert r2.json()["anomaly"]["status"] == "regression"
+    m = client.get("/metrics")
+    assert m.status_code == 200
+    assert "bonito_query_regression_pct" in m.text

@@ -107,36 +107,72 @@ def test_export_prometheus_enriched_gauges():
             "idx_scan": 34,
         }
     ]
-    emit.export_prometheus(queries, locks, sessions, tables)
+    emit.export_prometheus(queries, locks, sessions, tables)  # db_instance defaults to "default"
 
     # per-query
-    assert REGISTRY.get_sample_value("bonito_query_calls", {"fingerprint": "fp1"}) == 1284
-    assert REGISTRY.get_sample_value("bonito_query_max_ms", {"fingerprint": "fp1"}) == 841.02
-    assert REGISTRY.get_sample_value("bonito_query_rows", {"fingerprint": "fp1"}) == 245680
     assert REGISTRY.get_sample_value(
-        "bonito_query_buffer_hit_ratio", {"fingerprint": "fp1"}
+        "bonito_query_calls", {"fingerprint": "fp1", "db_instance": "default"}
+    ) == 1284
+    assert REGISTRY.get_sample_value(
+        "bonito_query_max_ms", {"fingerprint": "fp1", "db_instance": "default"}
+    ) == 841.02
+    assert REGISTRY.get_sample_value(
+        "bonito_query_rows", {"fingerprint": "fp1", "db_instance": "default"}
+    ) == 245680
+    assert REGISTRY.get_sample_value(
+        "bonito_query_buffer_hit_ratio", {"fingerprint": "fp1", "db_instance": "default"}
     ) == 99.2
     # sessions / waits
-    assert REGISTRY.get_sample_value("bonito_idle_in_transaction") == 1
     assert REGISTRY.get_sample_value(
-        "bonito_sessions_by_state", {"state": "active"}
+        "bonito_idle_in_transaction", {"db_instance": "default"}
     ) == 1
-    assert REGISTRY.get_sample_value("bonito_wait_events_total", {"type": "Lock"}) == 1
+    assert REGISTRY.get_sample_value(
+        "bonito_sessions_by_state", {"state": "active", "db_instance": "default"}
+    ) == 1
+    assert REGISTRY.get_sample_value(
+        "bonito_wait_events_total", {"type": "Lock", "db_instance": "default"}
+    ) == 1
     # per-table
     assert REGISTRY.get_sample_value(
-        "bonito_table_live_rows", {"table": "public.orders"}
+        "bonito_table_live_rows", {"table": "public.orders", "db_instance": "default"}
     ) == 100
     assert REGISTRY.get_sample_value(
-        "bonito_table_seq_scan", {"table": "public.orders"}
+        "bonito_table_seq_scan", {"table": "public.orders", "db_instance": "default"}
     ) == 12
     assert REGISTRY.get_sample_value(
-        "bonito_table_idx_scan", {"table": "public.orders"}
+        "bonito_table_idx_scan", {"table": "public.orders", "db_instance": "default"}
     ) == 34
 
     emit.record_scrape_duration(0.5)
     emit.record_collector_error()
     assert REGISTRY.get_sample_value("bonito_collector_scrape_duration_seconds") == 0.5
     assert REGISTRY.get_sample_value("bonito_collector_errors_total") == 1
+
+
+def test_export_prometheus_multi_instance_labels():
+    from prometheus_client import REGISTRY
+
+    from bonito_collector import emit
+
+    emit.export_prometheus(
+        [{"fingerprint": "fp1", "mean_ms": 12.43, "calls": 1284, "max_ms": 841.02, "rows": 245680, "buffer_hit_ratio": 99.2}],
+        [], [], [], db_instance="pg-app"
+    )
+    assert REGISTRY.get_sample_value(
+        "bonito_query_mean_ms", {"fingerprint": "fp1", "db_instance": "pg-app"}
+    ) == 12.43
+
+
+def test_config_multi_instance(monkeypatch):
+    monkeypatch.setenv(
+        "BONITO_INSTANCES",
+        '[{"name":"pg-app","engine":"postgresql","dsn":"postgresql://ro@a/db"},{"name":"mysql-app","engine":"mysql","dsn":"mysql://ro@b/app"}]',
+    )
+    cfg = CollectorConfig.from_env()
+    assert len(cfg.instances) == 2
+    assert cfg.instances[0].name == "pg-app"
+    assert cfg.instances[1].engine == "mysql"
+    assert cfg.dsn == "postgresql://ro@a/db"  # backward-compat accessor
 
 
 def test_otlp_disabled_by_default():

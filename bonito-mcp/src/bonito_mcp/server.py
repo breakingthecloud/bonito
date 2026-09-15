@@ -121,8 +121,9 @@ def make_tools(client: BonitoClient) -> dict[str, Callable[..., Any]]:
     async def compare_to_baseline(
         fingerprint: str, db_instance: str = "default", days: int = 7
     ) -> dict[str, Any]:
-        """Compare a query's current avg_ms against its 7-day baseline. regression_pct > 0 means slower.
-        Example: 'is the checkout query slower than usual?' -> compare_to_baseline(fingerprint='...')."""
+        """Compare a query's current avg_ms against its 7-day baseline. Returns baseline mean/p95,
+        regression_pct and an anomaly verdict (status: normal|regression, zscore).
+        Use when deciding if a query is actually slower. Example: 'is the checkout query slower than usual?' -> compare_to_baseline(fingerprint='...')."""
         return await client.baseline(fingerprint, db_instance, days)
 
     async def suggest_remediation_tool(
@@ -160,7 +161,7 @@ def build_mcp(client: BonitoClient) -> MCPServer:
             "trees, wait analysis, execution plans, baselines and remediation "
             "advice. Use these tools to diagnose PostgreSQL performance problems."
         ),
-        version="0.1.2",
+        version="0.2.0",
     )
     for name, fn in make_tools(client).items():
         server.tool(name=name)(fn)
