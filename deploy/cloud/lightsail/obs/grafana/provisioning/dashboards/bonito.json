@@ -263,7 +263,51 @@
       "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
       "fieldConfig": { "defaults": { "unit": "ms", "custom": { "drawStyle": "line", "fillOpacity": 10, "lineWidth": 1 } }, "overrides": [] },
       "options": { "tooltip": { "mode": "multi", "sort": "desc" }, "legend": { "displayMode": "list", "placement": "bottom" } },
-      "targets": [ { "refId": "A", "expr": "bonito_query_mean_ms", "legendFormat": "{{fingerprint}}" } ]
+"targets": [ { "refId": "A", "expr": "bonito_query_mean_ms", "legendFormat": "{{fingerprint}}" } ]
+    },
+    {
+      "id": 17,
+      "type": "table",
+      "title": "Query regression % (anomaly engine — BON-014)",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 40 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "color": { "mode": "thresholds", "fieldConfig": { "base": { "color": { "fixedColor": "green", "mode": "fixed" } } } },
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 20 }, { "color": "red", "value": 50 } ] }
+        },
+        "overrides": []
+      },
+      "options": { "showHeader": true },
+      "targets": [ { "refId": "A", "expr": "topk(20, bonito_query_regression_pct)", "legendFormat": "{{fingerprint}}" } ]
+    },
+    {
+      "id": 18,
+      "type": "table",
+      "title": "Anomaly flag (1 = regression)",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 40 },
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": { "showHeader": true },
+      "targets": [ { "refId": "A", "expr": "bonito_query_anomaly", "legendFormat": "{{fingerprint}}" } ]
+    },
+    {
+      "id": 19,
+      "type": "bargauge",
+      "title": "Active sessions by instance (BON-013)",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "h": 4, "w": 24, "x": 0, "y": 48 },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "unit": "short",
+          "thresholds": { "mode": "absolute", "steps": [ { "color": "green", "value": null }, { "color": "orange", "value": 10 }, { "color": "red", "value": 50 } ] }
+        },
+        "overrides": []
+      },
+      "options": { "orientation": "horizontal", "displayMode": "gradient", "showUnfilled": true },
+      "targets": [ { "refId": "A", "expr": "bonito_active_sessions", "legendFormat": "{{db_instance}}" } ]
     }
   ],
   "refresh": "10s",
@@ -275,5 +319,5 @@
   "timezone": "browser",
   "title": "Bonito — Deep DB View",
   "uid": "bonito-deep-db",
-  "version": 2
+  "version": 3
 }
