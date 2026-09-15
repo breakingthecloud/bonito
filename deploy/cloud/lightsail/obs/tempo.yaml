@@ -10,8 +10,32 @@ distributor:
         http:
           endpoint: 0.0.0.0:4318
 
+overrides:
+  metrics_generator_processors: ['service-graphs', 'span-metrics', 'local-blocks']
+
+metrics_generator:
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true
+  traces_storage:
+    path: /var/tempo/generator/traces
+  registry:
+    external_labels:
+      source: tempo
+  processor:
+    service_graphs: {}
+    span_metrics:
+      dimensions: []
+      enable_target_info: true
+    local_blocks:
+      filter_server_spans: false
+
 storage:
   trace:
     backend: local
+    wal:
+      path: /var/tempo/wal
     local:
       path: /var/tempo/blocks
