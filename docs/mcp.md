@@ -1,4 +1,4 @@
-# Bonito v0.1.0 — bonito-mcp
+# Bonito v0.2.0 — bonito-mcp
 
 The **killer differentiator** of Bonito (BON-004): an MCP server that gives any
 AI agent (Claude, Bedrock, Strands) native access to deep database

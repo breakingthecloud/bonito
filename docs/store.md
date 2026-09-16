@@ -1,9 +1,9 @@
-# Bonito v0.1.0 — bonito-store
+# Bonito v0.2.0 — bonito-store
 
 The persistence layer of Bonito. It stores exactly what Prometheus can't:
 **query texts, execution plans, lock events, session snapshots and table
 stats**, in a single SQLite file — and computes **7-day baselines** per query
-fingerprint for anomaly detection.
+fingerprint plus an **anomaly engine** (BON-014).
 
 ## Run it
 
@@ -25,13 +25,32 @@ bonito-store serve --db bonito.db        # FastAPI on :8000
 | `POST /events` | Ingest a collector snapshot (batch capped at 100 per type) |
 | `POST /plans` | Ingest execution plan records (stored as JSON) |
 | `GET /baselines?fingerprint=...&days=7` | 7-day rolling mean + p95 per query |
+| `GET /anomalies` | All queries currently in regression (z-score + `regression_pct`) |
+| `GET /metrics` | Prometheus: `bonito_query_anomaly`, `bonito_query_regression_pct` |
 | `GET /health` | Liveness |
 
 ```bash
 curl -X POST localhost:8000/events -H 'Content-Type: application/json' \
      -d @examples/events.sample.json
 curl localhost:8000/baselines
+curl localhost:8000/anomalies
 ```
+
+## Anomaly engine (BON-014)
+
+`GET /anomalies` compares each fingerprint's current average against its
+7-day baseline:
+
+```json
+[
+  { "fingerprint": "1978432790045853480", "current_avg_ms": 299467.79,
+    "baseline_mean_ms": 12.43, "regression_pct": 1100.0, "status": "regression" }
+]
+```
+
+The same verdict is exported to Prometheus (`bonito_query_anomaly=1`,
+`bonito_query_regression_pct`) — feed it to the `BonitoRegression` alert rule
+(see [Alerting](observability/alerting.md)).
 
 ## Schema (BON-002 deliverable 1)
 

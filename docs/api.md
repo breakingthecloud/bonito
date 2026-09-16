@@ -1,4 +1,4 @@
-# Bonito v0.1.0 — bonito-api
+# Bonito v0.2.0 — bonito-api
 
 The FastAPI **query layer** of Bonito (BON-003). Reads the `bonito-store`
 SQLite file and exposes it as structured JSON for AI agents, the MCP server
@@ -7,7 +7,7 @@ SQLite file and exposes it as structured JSON for AI agents, the MCP server
 **Key principle — contract public, deployment private:**
 
 - **Public:** the OpenAPI contract (`/openapi.json`, `/docs`, and the committed
-  [`bonito-api/openapi.yaml`](../bonito-api/openapi.yaml)). Consumers implement
+  [`bonito-api/openapi.yaml`](https://github.com/breakingthecloud/bonito/blob/main/bonito-api/openapi.yaml)). Consumers implement
   against *this*, never against a live instance.
 - **Private:** the running server. Every data endpoint requires an API key.
 
@@ -38,6 +38,7 @@ refuses to serve unauthenticated.
 | `GET /plans/{fingerprint}` | Latest execution plan (JSON) for a query |
 | `GET /health/{db_instance}` | Session states + top table bloat |
 | `GET /baseline/{fingerprint}?days=` | 7-day baseline (mean/p95) + regression % vs current |
+| `GET /anomalies` | All queries currently in regression |
 | `POST /ingest` | Compat webhook — same payload as store `POST /events` |
 
 `db_instance` is accepted everywhere to keep the contract multi-instance ready.

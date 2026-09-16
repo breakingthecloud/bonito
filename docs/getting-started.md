@@ -1,4 +1,4 @@
-# Bonito v0.1.0 — Quickstart
+# Getting started
 
 Get the **full Bonito pipeline** running locally in ~5 minutes:
 PostgreSQL → `bonito-collector` → `bonito-store` → `bonito-api` → baselines.
@@ -9,8 +9,6 @@ PostgreSQL → `bonito-collector` → `bonito-store` → `bonito-api` → baseli
 
 ## 1. Install
 
-All three packages (collector + store + api):
-
 ```bash
 uv venv --python 3.12 .venv
 source .venv/bin/activate
@@ -20,7 +18,7 @@ uv pip install -e ".[dev]" -e bonito-store -e bonito-api
 Verify:
 
 ```bash
-bonito-collector --version   # bonito-collector 0.1.2
+bonito-collector --version   # bonito-collector 0.2.0
 bonito-store --help          # serve | prune
 bonito-api --help            # serve | spec
 ```
@@ -74,8 +72,13 @@ Long-running loop (Prometheus on `:9187/metrics` + push to store):
 
 ```bash
 bonito-collector
-# bonito-collector 0.1.0 — Prometheus on :9187/metrics
+# bonito-collector 0.2.0 — Prometheus on :9187/metrics
 ```
+
+!!! tip "Multiple databases"
+    Set `BONITO_INSTANCES` (JSON) to monitor N databases with one collector.
+    Every metric/event gets a `db_instance` label. See
+    [Multi-instancia recipe](recipes/multi-instance.md).
 
 ---
 
@@ -85,7 +88,10 @@ bonito-collector
 export BONITO_API_KEY=change-me
 curl -H "X-API-Key: $BONITO_API_KEY" localhost:8100/queries/top?limit=5
 curl -H "X-API-Key: $BONITO_API_KEY" localhost:8100/baseline/-6842865755026457642
+curl -H "X-API-Key: $BONITO_API_KEY" localhost:8100/anomalies     # regression list
 ```
+
+---
 
 ## 6. Give an AI agent the tools (MCP)
 
@@ -103,20 +109,7 @@ claude mcp add bonito -- bonito-mcp
 
 Now the agent can answer "which queries are slow?", "who is blocking whom?",
 "is this query slower than its baseline?", and "what should I do?" — see
-`docs/mcp.md` for the full tool list and the deadlock demo flow.
-
-Or push the bundled sample snapshot into the store and read it:
-
-```bash
-./examples/store-push.sh
-```
-
-```json
-{ "baselines": [
-    { "fingerprint": "-6842865755026457642", "samples": 1,
-      "mean_ms": 12.43, "p95_ms": 12.43 }
-] }
-```
+[mcp.md](mcp.md) for the full tool list and the deadlock demo flow.
 
 ---
 
@@ -124,13 +117,15 @@ Or push the bundled sample snapshot into the store and read it:
 
 | Component | What |
 |-----------|------|
-| `bonito-collector` | Top queries, locks/blocking tree, sessions/waits, table bloat, `EXPLAIN` plans |
-| `bonito-store` | Persists those events + 7-day baselines per fingerprint |
+| `bonito-collector` | Top queries, locks/blocking tree, sessions/waits, table bloat, `EXPLAIN` plans — Prometheus + JSON events + OTLP spans |
+| `bonito-store` | Persists events + 7-day baselines + **anomaly engine** (`/anomalies`, `/metrics`) |
 | `bonito-api` | Query layer for AI agents / MCP / Remo (contract public, deployment private) |
 | `bonito-mcp` | 8 tools any AI agent consumes natively (Claude/Bedrock/Strands) |
-| Prometheus | Numeric gauges on `:9187/metrics` |
+| Prometheus | Numeric gauges on `:9187/metrics` + store `/metrics` (regression/anomaly) |
 
-Docs: [`docs/configuration.md`](configuration.md) ·
-[`docs/metrics-and-events.md`](metrics-and-events.md) ·
-[`docs/store.md`](store.md) · [`docs/api.md`](api.md) ·
-[`docs/mcp.md`](mcp.md)
+## Next steps
+
+- [Architecture](architecture.md) — full data flow
+- [Prometheus metrics](observability/metrics.md) — every `bonito_*` metric
+- [Alerting → Remo](observability/alerting.md) — turn metrics into AI-triaged alerts
+- [Configuration](configuration.md) — every env var

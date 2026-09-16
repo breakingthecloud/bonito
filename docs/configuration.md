@@ -1,4 +1,4 @@
-# Bonito v0.1.0 — Configuration
+# Bonito v0.2.0 — Configuration
 
 The collector is configured entirely through environment variables. There is no
 config file to keep the container story simple.
@@ -7,10 +7,15 @@ config file to keep the container story simple.
 
 | Variable | Required | Default | Description |
 |----------|:--------:|---------|-------------|
-| `BONITO_DSN` | ✅ | — | Read-only PostgreSQL DSN (`postgresql://user:pass@host:5432/db`) |
+| `BONITO_DSN` | ✅* | — | Read-only PostgreSQL DSN (`postgresql://user:pass@host:5432/db`) |
+| `BONITO_INSTANCES` | * | — | JSON `[{name, engine, dsn}]` — multi-instance (replaces `BONITO_DSN`, BON-013) |
 | `BONITO_TOP_N` | | `20` | Number of top queries / tables to collect |
-| `BONITO_STORE_URL` | | *(disabled)* | Base URL of bonito-store (or cloud endpoint); collector POSTs JSON events to `/events` |
+| `BONITO_STORE_URL` | | *(disabled)* | Base URL of bonito-store; collector POSTs JSON events to `/events` |
 | `BONITO_PROM_PORT` | | `9187` | Port for the Prometheus `/metrics` endpoint |
+| `BONITO_OTLP_ENDPOINT` | | *(disabled)* | OTLP endpoint for trace spans (Tempo, gRPC `:4317`) |
+
+\* either `BONITO_DSN` (single instance, name `default`) or `BONITO_INSTANCES`
+(one collector → N databases).
 
 See `examples/bonito.env.example` for a ready-to-copy template.
 

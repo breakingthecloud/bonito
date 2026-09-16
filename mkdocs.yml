@@ -1,27 +1,81 @@
 site_name: Bonito OSS
-site_description: Deep database observability — a free DBmarlin
-site_url: https://github.com/breakingthecloud/bonito
+site_description: Deep database observability — a free DBmarlin for PostgreSQL. Slow queries, lock trees, wait events, table bloat, baselines and AI-native MCP.
+site_url: https://bonito-docs.sofe.dev
 repo_url: https://github.com/breakingthecloud/bonito
+edit_uri: blob/main/docs/
 
 nav:
   - Home: index.md
-  - Quickstart: quickstart.md
-  - Collector & events: metrics-and-events.md
+  - Getting started: getting-started.md
+  - Architecture: architecture.md
+  - Collector: collector.md
   - Store: store.md
   - API: api.md
   - MCP server: mcp.md
   - Configuration: configuration.md
+  - Observability:
+      - Prometheus metrics: observability/metrics.md
+      - Grafana "Deep DB View": observability/grafana.md
+      - Tracing (OTLP / Tempo): observability/tracing.md
+      - Alerting → Remo: observability/alerting.md
+  - Integrations:
+      - Remo (AI triage): integrations/remo.md
+  - Recipes:
+      - Alertar a Remo en 10 min: recipes/alert-to-remo.md
+      - Detectar una regresión: recipes/detect-regression.md
+      - Multi-instancia con 1 collector: recipes/multi-instance.md
+  - Development: development.md
 
 theme:
   name: material
   palette:
-    scheme: slate
-    primary: teal
-    accent: cyan
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to dark mode
   icon:
     repo: fontawesome/brands/github
+  features:
+    - navigation.instant
+    - navigation.top
+    - navigation.tracking
+    - navigation.expand
+    - search.highlight
+    - search.share
+    - content.code.copy
+
+plugins:
+  - search
 
 markdown_extensions:
   - admonition
-  - codehilite
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
   - tables
+  - toc:
+      permalink: true
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/breakingthecloud/bonito
+    - icon: fontawesome/solid/fish
+      link: https://bonito.sofe.dev
+
+copyright: Copyright &copy; 2026 breakingthecloud — Apache 2.0
