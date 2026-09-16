@@ -1,6 +1,6 @@
 site_name: Bonito OSS
 site_description: Deep database observability — a free DBmarlin for PostgreSQL. Slow queries, lock trees, wait events, table bloat, baselines and AI-native MCP.
-site_url: https://bonito-docs.sofe.dev
+site_url: https://bonito.sofe.dev/docs/
 repo_url: https://github.com/breakingthecloud/bonito
 edit_uri: blob/main/docs/
 
@@ -28,6 +28,7 @@ nav:
 
 theme:
   name: material
+  custom_dir: overrides
   palette:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate

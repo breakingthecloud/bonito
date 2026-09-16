@@ -35,5 +35,15 @@ mkdocs build
 mkdocs serve        # http://localhost:8000
 ```
 
-Deploy to `bonito-docs.sofe.dev` via Cloudflare Pages (`mkdocs build` →
-publish `site/`; CNAME `bonito-docs` → `bonito-docs.pages.dev`).
+Docs live at **`bonito.sofe.dev/docs`** (mkdocs-material served inside the
+`bonito-landing` Astro site). Build + publish:
+
+```bash
+mkdocs build                                  # → site/
+cp -R site/ ~/dev/breakingthecloud/bonito-landing/public/docs/
+# then build + deploy bonito-landing (CF Pages → bonito.sofe.dev)
+```
+
+`site_url` is `https://bonito.sofe.dev/docs/` and `overrides/main.html`
+injects `<base href="/docs/">` so root-relative assets resolve under the
+subpath.

@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{# Serve the site under https://bonito.sofe.dev/docs/ — all root-absolute URLs
+   (assets, nav) resolve against <base href="/docs/">. #}
+{% block extrahead %}
+<base href="/docs/">
+{% endblock %}
