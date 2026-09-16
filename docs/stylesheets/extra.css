@@ -1,0 +1,66 @@
+/* Bonito brand overrides — match bonito.sofe.dev landing visual identity */
+
+:root {
+  --md-primary-fg-color: #22d3ee;          /* cyan accent */
+  --md-primary-fg-color--light: #67e8f9;
+  --md-primary-fg-color--dark: #0ea5e9;
+  --md-accent-fg-color: #22d3ee;
+  --md-typeset-a-color: #22d3ee;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-default-bg-color: #0a0e17;          /* landing page bg */
+  --md-default-fg-color: rgba(255, 255, 255, 0.92);
+  --md-default-fg-color--light: rgba(255, 255, 255, 0.72);
+  --md-default-fg-color--lighter: rgba(255, 255, 255, 0.5);
+  --md-code-bg-color: #061a26;             /* landing card bg */
+  --md-code-fg-color: #a5f3fc;
+}
+
+[data-md-color-scheme="default"] {
+  --md-default-bg-color: #f8fafc;
+  --md-primary-fg-color: #0891b2;
+  --md-typeset-a-color: #0891b2;
+}
+
+/* Header */
+.md-header {
+  background-color: #04131c;
+}
+[data-md-color-scheme="slate"] .md-header {
+  background-color: #04131c;
+}
+
+/* Top progress / tabs */
+.md-tabs {
+  background-color: #061a26;
+}
+[data-md-color-scheme="slate"] .md-tabs {
+  background-color: #061a26;
+}
+
+/* Code blocks tint */
+[data-md-color-scheme="slate"] .highlight,
+[data-md-color-scheme="slate"] code {
+  --md-code-bg-color: #061a26;
+}
+
+/* Header title in cyan-ish white, monospace-ish like landing brand */
+.md-header__title {
+  color: #ecfeff;
+  font-weight: 600;
+}
+
+/* Logo size in header */
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+/* Scrollbar faint cyan on dark */
+@media (prefers-color-scheme: dark) {
+  * {
+    scrollbar-color: #22d3ee66 #0a0e17;
+  }
+}

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Bonito OSS — marlin logo">
+  <defs>
+    <linearGradient id="bonito-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5eead4"/>
+      <stop offset="55%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="bonito-body" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2dd4bf"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- tail crescent -->
+  <path fill="url(#bonito-grad)" d="M10 46 C22 38 32 46 30 64 C32 82 22 90 10 82 C18 78 22 70 22 64 C22 58 18 50 10 46 Z"/>
+
+  <!-- dorsal sail -->
+  <path fill="url(#bonito-grad)" d="M46 40 C52 24 68 14 80 24 L78 48 C66 44 54 43 46 40 Z"/>
+
+  <!-- pectoral fin -->
+  <path fill="url(#bonito-grad)" d="M62 72 C58 82 66 88 74 80 Z"/>
+
+  <!-- body -->
+  <path fill="url(#bonito-body)" d="M30 64 C30 42 58 33 84 44 C99 50 105 62 97 72 C85 87 50 93 34 87 C30 85 30 76 30 64 Z"/>
+
+  <!-- bill (spear) -->
+  <path fill="url(#bonito-grad)" d="M84 45 C102 40 114 37 126 34 C120 48 106 56 94 57 C89 52 86 49 84 45 Z"/>
+
+  <!-- eye -->
+  <circle cx="70" cy="52" r="2.6" fill="#04131c"/>
+
+  <!-- motion line -->
+  <path d="M20 100 C40 100 88 100 108 100" stroke="#22d3ee" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 7" opacity="0.5"/>
+</svg>
