@@ -13,7 +13,20 @@ services:
       - --web.enable-remote-write-receiver
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./alerting:/etc/prometheus/alerting:ro
       - prom-data:/prometheus
+    networks: [bonito-net]
+
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    container_name: obs-alertmanager
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yml
+      - --storage.path=/alertmanager
+    volumes:
+      - ./alerting/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager-data:/alertmanager
     networks: [bonito-net]
 
   grafana:
@@ -59,3 +72,4 @@ volumes:
   prom-data:
   grafana-data:
   tempo-data:
+  alertmanager-data:

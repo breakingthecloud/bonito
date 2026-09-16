@@ -1,0 +1,62 @@
+groups:
+  - name: bonito
+    rules:
+      - alert: BonitoBlocking
+        expr: bonito_blocking_sessions > 0
+        for: 1m
+        labels:
+          severity: critical
+          source: bonito
+        annotations:
+          summary: "Blocking sessions on {{ $labels.db_instance }}"
+          description: "{{ $value }} blocking session pair(s) on instance {{ $labels.db_instance }}. Blocking tree at bonito-api /locks/active."
+
+      - alert: BonitoIdleInTransaction
+        expr: bonito_idle_in_transaction > 0
+        for: 2m
+        labels:
+          severity: warning
+          source: bonito
+        annotations:
+          summary: "Idle-in-transaction on {{ $labels.db_instance }}"
+          description: "{{ $value }} session(s) idle in transaction on {{ $labels.db_instance }}. They hold locks and bloat the DB."
+
+      - alert: BonitoQuerySlow
+        expr: topk(3, bonito_query_mean_ms) > 100
+        for: 2m
+        labels:
+          severity: warning
+          source: bonito
+        annotations:
+          summary: "Slow query (mean {{ $value }}ms) on {{ $labels.db_instance }}"
+          description: "Query {{ $labels.fingerprint }} on {{ $labels.db_instance }} mean {{ $value }}ms. EXPLAIN via bonito-api /queries/top."
+
+      - alert: BonitoRegression
+        expr: bonito_query_anomaly == 1
+        for: 1m
+        labels:
+          severity: critical
+          source: bonito
+        annotations:
+          summary: "Query regression (anomaly)"
+          description: "Query {{ $labels.fingerprint }} regressed vs 7-day baseline. Baseline at bonito-api /baseline/{{ $labels.fingerprint }}."
+
+      - alert: BonitoCollectorDown
+        expr: up{job="bonito-collector"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          source: bonito
+        annotations:
+          summary: "Bonito collector down ({{ $labels.instance }})"
+          description: "The bonito collector has not been scraped for 2m. DB observability is degraded."
+
+      - alert: BonitoStoreDown
+        expr: up{job="bonito-store"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          source: bonito
+        annotations:
+          summary: "Bonito store down ({{ $labels.instance }})"
+          description: "The bonito store is unreachable. Baseline/anomaly metrics are degraded."
